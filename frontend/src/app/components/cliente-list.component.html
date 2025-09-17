@@ -1,36 +1,255 @@
-<div class="row">
-    <div class="col-md-10">        
-        <table class="table">
-            <thead>
-                <tr>
-                    <th scope="col" class="clickable" (click)="orderBy('code')">Code</th>
-                    <th scope="col" class="clickable" (click)="orderBy('name')">Name</th>
-                    <th scope="col" class="clickable" (click)="orderBy('address')">Address</th>
-                    <th scope="col" class="clickable" (click)="orderBy('telephone')">Telephone</th>
-                    <th scope="col" class="clickable" (click)="orderBy('status')">Status</th>
-                    <th scope="col" class="clickable" (click)="orderBy('birthDate')">Birth Date</th>
-                    <th scope="col">Actions</th>
-                </tr>        
-            </thead>
-            <tbody>
-                <tr *ngFor="let c of clientList | async">
-                    <th scope="row">{{c.code}}</th>
-                    <td>{{c.name}}</td>
-                    <td>{{c.address}}</td>
-                    <td>{{c.telephone}}</td>
-                    <td>{{c.status}}</td>
-                    <td>{{c.birthDate|date:'MM/dd/yyyy'}}</td>
-                    <td>                       
-                        <a class="btn btn-primary" href="cliente/cad/{{c._id}}" role="button">edit</a>
-                        &nbsp;
-                        <button class="btn btn-danger" role="button" (click)="onRemove(c._id)">remove</button>
-                    </td>
-                </tr>                
-            </tbody>
-        </table>
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="mb-0">Client Management</h3>
+                    <div>
+                        <button
+                            type="button"
+                            class="btn btn-success me-2"
+                            (click)="export()"
+                            [disabled]="loading">
+                            <i class="fas fa-file-excel me-1"></i>
+                            Export Excel
+                        </button>
+                        <a
+                            class="btn btn-primary"
+                            [routerLink]="['/clients/add']"
+                            role="button">
+                            <i class="fas fa-plus me-1"></i>
+                            Add Client
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Loading indicator -->
+                    <div *ngIf="loading" class="text-center py-4">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2">Loading clients...</p>
+                    </div>
+
+                    <!-- Error message -->
+                    <div *ngIf="error && !loading" class="alert alert-danger" role="alert">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        {{ error }}
+                        <button type="button" class="btn btn-sm btn-outline-danger ms-2" (click)="loadList()">
+                            Try Again
+                        </button>
+                    </div>
+
+                    <!-- Table -->
+                    <div *ngIf="!loading && !error" class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th scope="col" class="clickable" (click)="orderBy('code')">
+                                        Code
+                                        <i class="fas fa-sort"
+                                           [class.fa-sort-up]="fieldOrderBy === 'code' && multiplierOrderBy === 1"
+                                           [class.fa-sort-down]="fieldOrderBy === 'code' && multiplierOrderBy === -1"></i>
+                                    </th>
+                                    <th scope="col" class="clickable" (click)="orderBy('name')">
+                                        Name
+                                        <i class="fas fa-sort"
+                                           [class.fa-sort-up]="fieldOrderBy === 'name' && multiplierOrderBy === 1"
+                                           [class.fa-sort-down]="fieldOrderBy === 'name' && multiplierOrderBy === -1"></i>
+                                    </th>
+                                    <th scope="col" class="clickable" (click)="orderBy('email')">
+                                        Email
+                                        <i class="fas fa-sort"
+                                           [class.fa-sort-up]="fieldOrderBy === 'email' && multiplierOrderBy === 1"
+                                           [class.fa-sort-down]="fieldOrderBy === 'email' && multiplierOrderBy === -1"></i>
+                                    </th>
+                                    <th scope="col" class="clickable d-none d-md-table-cell" (click)="orderBy('phone')">
+                                        Phone
+                                        <i class="fas fa-sort"
+                                           [class.fa-sort-up]="fieldOrderBy === 'phone' && multiplierOrderBy === 1"
+                                           [class.fa-sort-down]="fieldOrderBy === 'phone' && multiplierOrderBy === -1"></i>
+                                    </th>
+                                    <th scope="col" class="clickable d-none d-lg-table-cell" (click)="orderBy('address')">
+                                        Address
+                                        <i class="fas fa-sort"
+                                           [class.fa-sort-up]="fieldOrderBy === 'address' && multiplierOrderBy === 1"
+                                           [class.fa-sort-down]="fieldOrderBy === 'address' && multiplierOrderBy === -1"></i>
+                                    </th>
+                                    <th scope="col" class="clickable d-none d-md-table-cell" (click)="orderBy('birthDate')">
+                                        Birth Date
+                                        <i class="fas fa-sort"
+                                           [class.fa-sort-up]="fieldOrderBy === 'birthDate' && multiplierOrderBy === 1"
+                                           [class.fa-sort-down]="fieldOrderBy === 'birthDate' && multiplierOrderBy === -1"></i>
+                                    </th>
+                                    <th scope="col" class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let client of clientList$ | async; trackBy: trackByClientId" class="align-middle">
+                                    <td>
+                                        <strong>{{ client.code }}</strong>
+                                    </td>
+                                    <td>
+                                        <strong>{{ client.name }}</strong>
+                                        <div class="d-md-none small text-muted">
+                                            {{ client.email }}
+                                            <br *ngIf="client.phone">
+                                            <span *ngIf="client.phone">{{ client.phone }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="d-none d-md-table-cell">
+                                        <a [href]="'mailto:' + client.email" class="text-decoration-none">
+                                            {{ client.email }}
+                                        </a>
+                                    </td>
+                                    <td class="d-none d-md-table-cell">
+                                        <a *ngIf="client.phone" [href]="'tel:' + client.phone" class="text-decoration-none">
+                                            {{ client.phone }}
+                                        </a>
+                                        <span *ngIf="!client.phone" class="text-muted">-</span>
+                                    </td>
+                                    <td class="d-none d-lg-table-cell">
+                                        <span [title]="client.address" class="d-inline-block text-truncate" style="max-width: 200px;">
+                                            {{ client.address || '-' }}
+                                        </span>
+                                    </td>
+                                    <td class="d-none d-md-table-cell">
+                                        <span *ngIf="client.birthDate">
+                                            {{ client.birthDate | date:'MM/dd/yyyy' }}
+                                        </span>
+                                        <span *ngIf="!client.birthDate" class="text-muted">-</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <a
+                                                class="btn btn-outline-primary"
+                                                [routerLink]="['/clients/edit', client._id]"
+                                                [attr.aria-label]="'Edit ' + client.name"
+                                                title="Edit client">
+                                                <i class="fas fa-edit"></i>
+                                                <span class="d-none d-lg-inline ms-1">Edit</span>
+                                            </a>
+                                            <button
+                                                type="button"
+                                                class="btn btn-outline-danger"
+                                                (click)="onRemove(client._id!)"
+                                                [attr.aria-label]="'Delete ' + client.name"
+                                                title="Delete client">
+                                                <i class="fas fa-trash"></i>
+                                                <span class="d-none d-lg-inline ms-1">Delete</span>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr *ngIf="(clientList$ | async)?.length === 0" class="text-center">
+                                    <td colspan="7" class="py-4 text-muted">
+                                        <i class="fas fa-users fa-2x mb-2 d-block"></i>
+                                        <p class="mb-0">No clients found</p>
+                                        <a [routerLink]="['/clients/add']" class="btn btn-primary btn-sm mt-2">
+                                            Add your first client
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination Controls -->
+                    <div *ngIf="!loading && !error && totalItems > 0" class="d-flex flex-column flex-md-row justify-content-between align-items-center mt-3">
+                        <!-- Pagination Info -->
+                        <div class="mb-2 mb-md-0">
+                            <span class="text-muted small">{{ paginationInfo }}</span>
+                        </div>
+
+                        <!-- Page Size Selector -->
+                        <div class="mb-2 mb-md-0">
+                            <label for="pageSize" class="form-label small me-2">Items per page:</label>
+                            <select id="pageSize" class="form-select form-select-sm d-inline-block"
+                                    style="width: auto;"
+                                    [value]="pageSize"
+                                    (change)="onPageSizeChange(+$any($event.target).value)">
+                                <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
+                            </select>
+                        </div>
+
+                        <!-- Pagination Navigation -->
+                        <nav aria-label="Client list pagination" *ngIf="totalPages > 1">
+                            <ul class="pagination pagination-sm mb-0">
+                                <!-- Previous Button -->
+                                <li class="page-item" [class.disabled]="currentPage === 1">
+                                    <button class="page-link"
+                                            [disabled]="currentPage === 1"
+                                            (click)="onPageChange(currentPage - 1)"
+                                            aria-label="Previous page">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </button>
+                                </li>
+
+                                <!-- First Page -->
+                                <li class="page-item" *ngIf="getPaginationRange()[0] > 1">
+                                    <button class="page-link" (click)="onPageChange(1)">1</button>
+                                </li>
+                                <li class="page-item disabled" *ngIf="getPaginationRange()[0] > 2">
+                                    <span class="page-link">...</span>
+                                </li>
+
+                                <!-- Page Numbers -->
+                                <li class="page-item"
+                                    *ngFor="let page of getPaginationRange()"
+                                    [class.active]="page === currentPage">
+                                    <button class="page-link"
+                                            (click)="onPageChange(page)"
+                                            [attr.aria-label]="'Go to page ' + page"
+                                            [attr.aria-current]="page === currentPage ? 'page' : null">
+                                        {{ page }}
+                                    </button>
+                                </li>
+
+                                <!-- Last Page -->
+                                <li class="page-item disabled" *ngIf="getPaginationRange()[getPaginationRange().length - 1] < totalPages - 1">
+                                    <span class="page-link">...</span>
+                                </li>
+                                <li class="page-item" *ngIf="getPaginationRange()[getPaginationRange().length - 1] < totalPages">
+                                    <button class="page-link" (click)="onPageChange(totalPages)">{{ totalPages }}</button>
+                                </li>
+
+                                <!-- Next Button -->
+                                <li class="page-item" [class.disabled]="currentPage === totalPages">
+                                    <button class="page-link"
+                                            [disabled]="currentPage === totalPages"
+                                            (click)="onPageChange(currentPage + 1)"
+                                            aria-label="Next page">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </button>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
-<div class="row">
-    <button type="button" class="btn btn-success" (click)="export()">Export XLS</button>
-</div>
 
+<style>
+.clickable {
+    cursor: pointer;
+    user-select: none;
+}
+
+.clickable:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.table-responsive {
+    border-radius: 0.375rem;
+}
+
+.btn-group-sm .btn {
+    border-radius: 0.25rem;
+}
+
+.fas {
+    font-size: 0.875em;
+}
+</style>

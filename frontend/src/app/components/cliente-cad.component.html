@@ -1,70 +1,150 @@
-<div>
-    <div *ngIf="loading" class="text-center">
-        <p>Loading client data...</p>
-    </div>
-    <form [formGroup]="form" (ngSubmit)="onSubmit()" (onDataLoaded)="onDataLoaded($event)" *ngIf="!loading">          
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header">
+                    <h3>{{ id ? 'Edit Client' : 'Add New Client' }}</h3>
+                </div>
+                <div class="card-body">
+                    <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+                        <div class="row">
+                            <div class="form-group col-md-6 mb-3">
+                                <label for="code" class="form-label">Client Code *</label>
+                                <input
+                                    type="number"
+                                    id="code"
+                                    class="form-control"
+                                    [class.is-invalid]="getFieldError('code')"
+                                    [class.is-valid]="form.get('code')?.valid && form.get('code')?.touched"
+                                    placeholder="Enter client code"
+                                    formControlName="code"
+                                    min="1" />
+                                <div *ngIf="getFieldError('code')" class="invalid-feedback">
+                                    {{ getFieldError('code') }}
+                                </div>
+                            </div>
 
-        <div class="form-group col-md-6">
-            <label for="code">Code</label>
-            <input type="number" id="code" class="form-control" placeholder="Code" formControlName="code" [disabled]="submited" required />
-            <small *ngIf="submited && form.get('code')?.errors?.required" 
-                class="form-text text-muted">*Required field
-            </small>
-        </div>   
+                            <div class="form-group col-md-6 mb-3">
+                                <label for="name" class="form-label">Name *</label>
+                                <input
+                                    type="text"
+                                    id="name"
+                                    class="form-control"
+                                    [class.is-invalid]="getFieldError('name')"
+                                    [class.is-valid]="form.get('name')?.valid && form.get('name')?.touched"
+                                    placeholder="Enter client name"
+                                    formControlName="name"
+                                    maxlength="100" />
+                                <div *ngIf="getFieldError('name')" class="invalid-feedback">
+                                    {{ getFieldError('name') }}
+                                </div>
+                            </div>
 
-        <div class="form-group col-md-6">
-            <label for="name">Name</label>
-            <input type="text" id="name" class="form-control" placeholder="Name" formControlName="name" [disabled]="submited" required />
-            <small *ngIf="submited && form.get('name')?.errors?.required" 
-                class="form-text text-muted">*Required field
-            </small>
-        </div>   
+                            <div class="form-group col-md-6 mb-3">
+                                <label for="email" class="form-label">Email *</label>
+                                <input
+                                    type="email"
+                                    id="email"
+                                    class="form-control"
+                                    [class.is-invalid]="getFieldError('email')"
+                                    [class.is-valid]="form.get('email')?.valid && form.get('email')?.touched"
+                                    placeholder="Enter email address"
+                                    formControlName="email" />
+                                <div *ngIf="getFieldError('email')" class="invalid-feedback">
+                                    {{ getFieldError('email') }}
+                                </div>
+                            </div>
+                        </div>
 
-        <div class="form-group col-md-6">
-            <label for="address">Address</label>
-            <input type="text" id="address" class="form-control" placeholder="Address" formControlName="address" [disabled]="submited" required />
-            <small *ngIf="submited && form.get('address')?.errors?.required" 
-                class="form-text text-muted">*Required field
-            </small>
+                        <div class="row">
+                            <div class="form-group col-md-6 mb-3">
+                                <label for="phone" class="form-label">Phone</label>
+                                <input
+                                    type="tel"
+                                    id="phone"
+                                    class="form-control"
+                                    [class.is-invalid]="getFieldError('phone')"
+                                    [class.is-valid]="form.get('phone')?.valid && form.get('phone')?.touched"
+                                    placeholder="Enter phone number"
+                                    formControlName="phone" />
+                                <div *ngIf="getFieldError('phone')" class="invalid-feedback">
+                                    {{ getFieldError('phone') }}
+                                </div>
+                            </div>
+
+                            <div class="form-group col-md-6 mb-3">
+                                <label for="birthDate" class="form-label">Birth Date</label>
+                                <input
+                                    type="date"
+                                    id="birthDate"
+                                    class="form-control"
+                                    [class.is-invalid]="getFieldError('birthDate')"
+                                    [class.is-valid]="form.get('birthDate')?.valid && form.get('birthDate')?.touched"
+                                    formControlName="birthDate" />
+                                <div *ngIf="getFieldError('birthDate')" class="invalid-feedback">
+                                    {{ getFieldError('birthDate') }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="form-group col-md-12 mb-3">
+                                <label for="address" class="form-label">Address</label>
+                                <textarea
+                                    id="address"
+                                    class="form-control"
+                                    [class.is-invalid]="getFieldError('address')"
+                                    [class.is-valid]="form.get('address')?.valid && form.get('address')?.touched"
+                                    placeholder="Enter address"
+                                    formControlName="address"
+                                    rows="3"
+                                    maxlength="200"></textarea>
+                                <div *ngIf="getFieldError('address')" class="invalid-feedback">
+                                    {{ getFieldError('address') }}
+                                </div>
+                                <div class="form-text">{{ form.get('address')?.value?.length || 0 }}/200 characters</div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="d-flex gap-2">
+                                    <button
+                                        type="submit"
+                                        class="btn btn-primary"
+                                        [disabled]="loading">
+                                        <span *ngIf="loading" class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+                                        {{ loading ? 'Saving...' : (id ? 'Update Client' : 'Create Client') }}
+                                    </button>
+                                    <button
+                                        type="button"
+                                        class="btn btn-secondary"
+                                        (click)="onCancel()"
+                                        [disabled]="loading">
+                                        Cancel
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div *ngIf="message" class="mt-3">
+                        <div
+                            class="alert"
+                            [class.alert-success]="!isError"
+                            [class.alert-danger]="isError"
+                            role="alert">
+                            {{ message }}
+                        </div>
+                    </div>
+
+                    <div *ngIf="loading" class="text-center mt-3">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-
-        <div class="form-group col-md-6">
-            <label for="address">Telephone</label>
-            <input type="text" id="telephone" class="form-control" placeholder="Telephone" formControlName="telephone" [disabled]="submited" required />
-            <small *ngIf="submited && form.get('telephone')?.errors?.required" 
-                class="form-text text-muted">*Required field
-            </small>
-        </div>
-
-        <div class="form-group col-md-6">
-            <label for="status">Status</label>
-            <select id="status" class="form-control" formControlName="status" [disabled]="submited" required>
-                <option value="" selected>(selecione)</option>
-                <option value="active">active</option>
-                <option value="deleted">deleted</option>
-                <option value="inactive">inactive</option>
-            </select>             
-            <small *ngIf="submited && form.get('status')?.errors?.required" 
-                class="form-text text-muted">*Required field
-            </small>
-        </div>  
-        
-        <div class="form-group col-md-6">
-            <label for="birthDate">Birth Date</label>
-            <input type="text" id="birthDate" class="form-control" placeholder="Birth Date" formControlName="birthDate" [disabled]="submited" required />
-            <small *ngIf="submited && form.get('birthDate')?.errors?.required" 
-                class="form-text text-muted">*Required field
-            </small>
-        </div>        
-
-        <button class="btn btn-primary" type="submit" [disabled]="submited">
-            <span *ngIf="!submited">Save</span>
-            <span *ngIf="submited">Saving...</span>
-        </button>
-    </form>
-
-    <div *ngIf="message">
-        <br/><br/>
-        <div [class.alert-danger]="error">{{ message }}</div>
     </div>
 </div>
