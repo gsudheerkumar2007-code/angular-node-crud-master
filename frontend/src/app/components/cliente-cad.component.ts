@@ -15,6 +15,7 @@ export class ClienteCadComponent implements OnInit, AfterViewInit {
   routerSub: any;
 
   submited = false;
+  showValidationErrors = false;
   message = null;
   error = false;
   loading = false;
@@ -59,9 +60,10 @@ export class ClienteCadComponent implements OnInit, AfterViewInit {
   }
 
   onSubmit() {
-    this.submited = true;
-
+    this.showValidationErrors = true;
+    
     if (this.form.valid) {
+      this.submited = true;
       const cliente: Cliente = this.form.value;
 
       if (this.id) {
@@ -92,6 +94,7 @@ export class ClienteCadComponent implements OnInit, AfterViewInit {
         data => {
           this.form.reset();
           this.submited = false;
+          this.showValidationErrors = false;
           this.message = 'Client successfully created.';
         },
         error =>  {
