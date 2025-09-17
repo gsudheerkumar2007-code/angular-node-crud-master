@@ -4,9 +4,15 @@ import { ClienteCadComponent } from './components/cliente-cad.component';
 import { ClienteListComponent } from './components/cliente-list.component';
 
 const routes: Routes = [
-  { path: 'cliente/cad', component: ClienteCadComponent },
-  { path: 'cliente/cad/:id', component: ClienteCadComponent },
-  { path: 'cliente/list', component: ClienteListComponent },
+  { path: '', redirectTo: '/clients', pathMatch: 'full' },
+  { path: 'clients', component: ClienteListComponent },
+  { path: 'clients/add', component: ClienteCadComponent },
+  { path: 'clients/edit/:id', component: ClienteCadComponent },
+  // Legacy routes for backward compatibility
+  { path: 'cliente/list', redirectTo: '/clients' },
+  { path: 'cliente/cad', redirectTo: '/clients/add' },
+  { path: 'cliente/cad/:id', redirectTo: '/clients/edit/:id' },
+  { path: '**', redirectTo: '/clients' }
 ];
 
 @NgModule({

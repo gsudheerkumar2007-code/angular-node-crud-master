@@ -22,7 +22,7 @@ import { ExportService } from './services/export.service';
     ReactiveFormsModule,
     HttpClientModule
   ],
-  providers: [ ClienteService, ExportService],
+  providers: [ExportService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

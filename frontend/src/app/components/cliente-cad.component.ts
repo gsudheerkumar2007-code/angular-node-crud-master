@@ -1,97 +1,237 @@
-import { Component, ViewChild, AfterViewInit, OnInit } from '@angular/core';
-import { FormGroup, Validators, FormControl, FormBuilder } from '@angular/forms';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
+import { FormGroup, Validators, FormBuilder, AbstractControl } from '@angular/forms';
 import { ClienteService } from '../services/cliente.service';
 import { Cliente } from '../interfaces/cliente.interface';
-import { ActivatedRoute } from '@angular/router';
-import * as moment from 'moment';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Subject, EMPTY } from 'rxjs';
+import { takeUntil, catchError, finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'cliente-cad',
   templateUrl: './cliente-cad.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ClienteCadComponent implements OnInit, AfterViewInit {
+export class ClienteCadComponent implements OnInit, OnDestroy {
+  private readonly destroy$ = new Subject<void>();
 
-  id: string = null;
-  routerSub: any;
-
+  id: string | null = null;
   submited = false;
-  message = null;
-  error = false;
-  
-  form = this.initForm();
+  loading = false;
+  message: string | null = null;
+  isError = false;
 
-  constructor(private fb: FormBuilder, private clienteService: ClienteService, private route: ActivatedRoute) { }
+  form: FormGroup = this.initForm();
 
-  ngOnInit() {
-    this.routerSub = this.route.params.subscribe((params) => {
-			this.id = params['id'];
-		});
+  constructor(
+    private fb: FormBuilder,
+    private clienteService: ClienteService,
+    private route: ActivatedRoute,
+    private router: Router
+  ) { }
+
+  ngOnInit(): void {
+    this.route.params
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (params) => {
+          this.id = params['id'] || null;
+          if (this.id) {
+            this.loadClient();
+          }
+        }
+      });
   }
 
-  initForm(client?) {
-    return this.fb.group({      
-      code:  [client && client.code ? client.code : '', [Validators.required]],
-      name: [client && client.name ? client.name : '', [Validators.required]],
-      address:  [client && client.address ? client.address : '', [Validators.required]],
-      telephone:  [client && client.telephone ? client.telephone : '', [Validators.required]],
-      status:  [client && client.status ? client.status : '', [Validators.required]],
-      birthDate:  [client && client.birthDate ? moment(client.birthDate).format('MM/DD/YYYY') : '', [Validators.required]],
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  private initForm(client?: Cliente): FormGroup {
+    return this.fb.group({
+      code: [
+        client?.code || '',
+        [Validators.required, Validators.min(1)]
+      ],
+      name: [
+        client?.name || '',
+        [Validators.required, Validators.minLength(2), Validators.maxLength(100)]
+      ],
+      email: [
+        client?.email || '',
+        [Validators.required, Validators.email]
+      ],
+      phone: [
+        client?.phone || '',
+        [Validators.pattern(/^[+]?[0-9\s\-\(\)]{10,15}$/)]
+      ],
+      address: [
+        client?.address || '',
+        [Validators.maxLength(200)]
+      ],
+      birthDate: [
+        client?.birthDate ? this.formatDateForInput(client.birthDate) : '',
+        [this.dateValidator]
+      ]
     });
   }
 
-	ngAfterViewInit() {
+  private formatDateForInput(date: Date | string): string {
+    if (!date) return '';
 
-    if(this.id) {
-      this.clienteService.getById(this.id)
-      .subscribe(
-        data => {
+    const dateObj = new Date(date);
+    if (isNaN(dateObj.getTime())) return '';
+
+    return dateObj.toISOString().split('T')[0];
+  }
+
+  private dateValidator(control: AbstractControl): { [key: string]: any } | null {
+    if (!control.value) return null;
+
+    const date = new Date(control.value);
+    const today = new Date();
+
+    if (isNaN(date.getTime())) {
+      return { invalidDate: true };
+    }
+
+    if (date > today) {
+      return { futureDate: true };
+    }
+
+    return null;
+  }
+
+  private loadClient(): void {
+    if (!this.id) return;
+
+    this.loading = true;
+    this.message = null;
+    this.isError = false;
+
+    this.clienteService.getById(this.id)
+      .pipe(
+        takeUntil(this.destroy$),
+        catchError(error => {
+          console.error('Error loading client:', error);
+          this.message = error.message || 'Failed to load client';
+          this.isError = true;
+          return EMPTY;
+        }),
+        finalize(() => this.loading = false)
+      )
+      .subscribe({
+        next: (data: Cliente) => {
           this.form = this.initForm(data);
-        },
-        error =>  {
-          this.message = error;
         }
-      );
-    }
+      });
   }
 
-  onSubmit() {
+  onSubmit(): void {
     this.submited = true;
+    this.message = null;
+    this.isError = false;
 
-    if (this.form.valid) {
-      const cliente: Cliente = this.form.value;
+    if (!this.form.valid) {
+      this.markFormGroupTouched(this.form);
+      return;
+    }
 
-      if (this.id) {
-        this.update(cliente);
-      } else {
-        this.create(cliente);
-      }
+    const cliente: Cliente = {
+      ...this.form.value,
+      birthDate: this.form.value.birthDate ? new Date(this.form.value.birthDate) : undefined
+    };
+
+    if (this.id) {
+      this.updateClient(cliente);
+    } else {
+      this.createClient(cliente);
     }
   }
 
-  update(cliente: Cliente) {
-    this.clienteService.update(this.id, cliente)
-    .subscribe(
-      data => {
-        this.submited = false;
-        this.message = 'Client successfully updated.';
-      },
-      error =>  {
-        this.message = error;
-      }
-    );
+  private updateClient(cliente: Partial<Cliente>): void {
+    this.loading = true;
+
+    this.clienteService.update(this.id!, cliente)
+      .pipe(
+        takeUntil(this.destroy$),
+        catchError(error => {
+          console.error('Error updating client:', error);
+          this.message = error.message || 'Failed to update client';
+          this.isError = true;
+          return EMPTY;
+        }),
+        finalize(() => {
+          this.loading = false;
+          this.submited = false;
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.message = 'Client successfully updated!';
+          this.isError = false;
+          setTimeout(() => this.router.navigate(['/clients']), 2000);
+        }
+      });
   }
 
-  create(cliente: Cliente) {
-      this.clienteService.save(cliente)
-      .subscribe(
-        data => {
-          this.form.reset();
+  private createClient(cliente: Cliente): void {
+    this.loading = true;
+
+    this.clienteService.save(cliente)
+      .pipe(
+        takeUntil(this.destroy$),
+        catchError(error => {
+          console.error('Error creating client:', error);
+          this.message = error.message || 'Failed to create client';
+          this.isError = true;
+          return EMPTY;
+        }),
+        finalize(() => {
+          this.loading = false;
           this.submited = false;
-          this.message = 'Client successfully created.';
-        },
-        error =>  {
-          this.message = error;
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.form.reset();
+          this.message = 'Client successfully created!';
+          this.isError = false;
+          setTimeout(() => this.router.navigate(['/clients']), 2000);
         }
-      );
+      });
+  }
+
+  private markFormGroupTouched(formGroup: FormGroup): void {
+    Object.keys(formGroup.controls).forEach(key => {
+      const control = formGroup.get(key);
+      control?.markAsTouched();
+
+      if (control instanceof FormGroup) {
+        this.markFormGroupTouched(control);
+      }
+    });
+  }
+
+  getFieldError(fieldName: string): string | null {
+    const field = this.form.get(fieldName);
+    if (!field || !field.touched || !field.errors) return null;
+
+    const errors = field.errors;
+
+    if (errors['required']) return `${fieldName} is required`;
+    if (errors['email']) return 'Please enter a valid email address';
+    if (errors['minlength']) return `${fieldName} must be at least ${errors['minlength'].requiredLength} characters`;
+    if (errors['maxlength']) return `${fieldName} cannot exceed ${errors['maxlength'].requiredLength} characters`;
+    if (errors['pattern']) return `Please enter a valid ${fieldName} format`;
+    if (errors['min']) return `${fieldName} must be at least ${errors['min'].min}`;
+    if (errors['invalidDate']) return 'Please enter a valid date';
+    if (errors['futureDate']) return 'Birth date cannot be in the future';
+
+    return 'Invalid input';
+  }
+
+  onCancel(): void {
+    this.router.navigate(['/clients']);
   }
 }

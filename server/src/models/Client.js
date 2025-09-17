@@ -10,23 +10,50 @@ const ClientSchema = new mongoose.Schema({
 		type: String,
 		required: true
 	},
+	email: {
+		type: String,
+		required: true,
+		unique: true,
+		lowercase: true,
+		trim: true
+	},
+	phone: {
+		type: String,
+		required: false,
+		trim: true
+	},
 	address: {
 		type: String,
-		required: true
+		required: false
 	},
 	telephone: {
 		type: String,
-		required: true
+		required: false
     },
     status: {
         type: String,
-        required: true
+        required: true,
+        default: 'active'
 	},
 	birthDate: {
 		type: Date,
-		required: true
+		required: false
 	}
+}, {
+	timestamps: true
 });
+
+// Add indexes for better performance
+ClientSchema.index({ email: 1 }, { unique: true });
+ClientSchema.index({ name: 1 });
+ClientSchema.index({ status: 1 });
+ClientSchema.index({ code: 1 }, { unique: true });
+ClientSchema.index({ createdAt: 1 });
+ClientSchema.index({ updatedAt: 1 });
+
+// Compound indexes for common queries
+ClientSchema.index({ status: 1, createdAt: -1 });
+ClientSchema.index({ name: 1, email: 1 });
 
 ClientSchema.plugin(mongoosePaginate);
 mongoose.model('Client', ClientSchema);

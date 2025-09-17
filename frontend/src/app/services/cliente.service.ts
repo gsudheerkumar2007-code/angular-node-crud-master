@@ -1,44 +1,45 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Cliente } from '../interfaces/cliente.interface';
+import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
+import { Cliente, ApiResponse, ApiError } from '../interfaces/cliente.interface';
 import { Observable, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class ClienteService {
+  private readonly apiUrl = '/api/client';
+
   constructor(private http: HttpClient) { }
 
-  apiUrl = '/api/client';
+  private handleError = (error: HttpErrorResponse): Observable<never> => {
+    let errorMessage = 'An unexpected error occurred';
 
-  private handleError(error: HttpErrorResponse) {
+    if (error.error instanceof ErrorEvent) {
+      // Client-side or network error
+      errorMessage = `Network error: ${error.error.message}`;
+      console.error('Client-side error:', error.error.message);
+    } else {
+      // Backend error
+      const apiError = error.error as ApiError;
 
-    if (error.error.errors) {
-      const mongoErrors = error.error.errors;
-      let message = '';
-
-      for (const key in mongoErrors) {
-        if (mongoErrors.hasOwnProperty(key)) {
-          message = `MongoDB error at field ${key}: ${mongoErrors[key].message}`;
-          break;
-        }
+      if (apiError?.details && apiError.details.length > 0) {
+        // Validation errors
+        errorMessage = apiError.details.map(detail =>
+          `${detail.field}: ${detail.message}`
+        ).join(', ');
+      } else if (apiError?.error) {
+        errorMessage = apiError.error;
+      } else if (apiError?.message) {
+        errorMessage = apiError.message;
+      } else {
+        errorMessage = `Server error: ${error.status} ${error.statusText}`;
       }
 
-      return throwError(message);
-    } else if (error.error.message) {
-      return throwError(error.error.message);
-    } else if (error.error instanceof ErrorEvent) {
-      // A client-side or network error occurred. Handle it accordingly.
-      console.error('An error occurred:', error.error.message);
-    } else {
-      // The backend returned an unsuccessful response code.
-      // The response body may contain clues as to what went wrong,
-      console.error(
-        `Backend returned code ${error.status}, ` +
-        `body was: ${error.error}`);
+      console.error(`Backend error: ${error.status}`, error.error);
     }
-    // return an observable with a user-facing error message
-    return throwError(
-      'Something bad happened; please try again later.');
+
+    return throwError(() => new Error(errorMessage));
   }
 
   save(cliente: Cliente): Observable<Cliente> {
@@ -48,22 +49,66 @@ export class ClienteService {
       );
   }
 
-  update(id: string, cliente: Cliente): Observable<Cliente> {
-    return this.http.put<Cliente>(this.apiUrl + '/' + id, cliente)
+  update(id: string, cliente: Partial<Cliente>): Observable<Cliente> {
+    if (!id || !id.trim()) {
+      return throwError(() => new Error('Client ID is required'));
+    }
+
+    return this.http.put<Cliente>(`${this.apiUrl}/${id}`, cliente)
       .pipe(
         catchError(this.handleError)
       );
-  }  
-
-  getAll() {
-    return this.http.get<any>(this.apiUrl);
   }
 
-  getById(id: string) {
-    return this.http.get<Cliente>(this.apiUrl + '/' + id);
+  getAll(page: number = 1, limit: number = 10): Observable<Cliente[]> {
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('limit', limit.toString());
+
+    return this.http.get<ApiResponse<Cliente[]> | Cliente[]>(this.apiUrl, { params })
+      .pipe(
+        map(response => {
+          // Handle both old and new API response formats
+          if (Array.isArray(response)) {
+            return response;
+          } else {
+            return (response as ApiResponse<Cliente[]>).data;
+          }
+        }),
+        catchError(this.handleError)
+      );
   }
 
-  delete(id: string) {
-    return this.http.delete(this.apiUrl + '/' + id);
+  getById(id: string): Observable<Cliente> {
+    if (!id || !id.trim()) {
+      return throwError(() => new Error('Client ID is required'));
+    }
+
+    return this.http.get<Cliente>(`${this.apiUrl}/${id}`)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  delete(id: string): Observable<{ message: string }> {
+    if (!id || !id.trim()) {
+      return throwError(() => new Error('Client ID is required'));
+    }
+
+    return this.http.delete<{ message: string }>(`${this.apiUrl}/${id}`)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  getAllWithPagination(page: number = 1, limit: number = 10): Observable<ApiResponse<Cliente[]>> {
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('limit', limit.toString());
+
+    return this.http.get<ApiResponse<Cliente[]>>(this.apiUrl, { params })
+      .pipe(
+        catchError(this.handleError)
+      );
   }
 }
