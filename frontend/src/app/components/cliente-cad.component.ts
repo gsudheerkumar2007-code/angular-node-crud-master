@@ -17,6 +17,7 @@ export class ClienteCadComponent implements OnInit, AfterViewInit {
   submited = false;
   message = null;
   error = false;
+  loading = false;
   
   form = this.initForm();
 
@@ -42,13 +43,16 @@ export class ClienteCadComponent implements OnInit, AfterViewInit {
 	ngAfterViewInit() {
 
     if(this.id) {
+      this.loading = true;
       this.clienteService.getById(this.id)
       .subscribe(
         data => {
           this.form = this.initForm(data);
+          this.loading = false;
         },
         error =>  {
           this.message = error;
+          this.loading = false;
         }
       );
     }
@@ -77,6 +81,7 @@ export class ClienteCadComponent implements OnInit, AfterViewInit {
       },
       error =>  {
         this.message = error;
+        this.submited = false;
       }
     );
   }
@@ -91,6 +96,7 @@ export class ClienteCadComponent implements OnInit, AfterViewInit {
         },
         error =>  {
           this.message = error;
+          this.submited = false;
         }
       );
   }
