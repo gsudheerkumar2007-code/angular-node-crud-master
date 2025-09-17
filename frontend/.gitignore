@@ -6,6 +6,7 @@
 /out-tsc
 # Only exists if Bazel was run
 /bazel-out
+/.angular
 
 # dependencies
 /node_modules
@@ -44,3 +45,7 @@ testem.log
 # System Files
 .DS_Store
 Thumbs.db
+
+# Claude Code settings
+.claude/
+settings.local.json

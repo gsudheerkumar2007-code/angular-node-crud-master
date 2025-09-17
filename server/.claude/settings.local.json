@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/AI/Claude/angular-node-crud-master/angular-node-crud-master/**)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

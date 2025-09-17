@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cat:*)",
+      "Bash(git rm:*)",
+      "Bash(npm install)",
+      "Bash(npm install:*)",
+      "Bash(npm cache clean:*)",
+      "Bash(if exist package-lock.json del package-lock.json)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
