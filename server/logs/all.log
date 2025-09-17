@@ -1,0 +1,57 @@
+2025-09-13 18:32:50:3250 [32minfo[39m: [32mServer running on port 3001[39m
+2025-09-13 18:32:50:3250 [32minfo[39m: [32mEnvironment: development[39m
+2025-09-13 18:32:50:3250 [32minfo[39m: [32mCORS Origin: http://localhost:4200[39m
+2025-09-13 18:32:50:3250 [32minfo[39m: [32mMongoDB connected successfully[39m
+2025-09-13 18:32:50:3250 [32minfo[39m: [32mDatabase connection established[39m
+2025-09-13 20:34:21:3421 [32minfo[39m: [32mServer running on port 3001[39m
+2025-09-13 20:34:21:3421 [32minfo[39m: [32mEnvironment: development[39m
+2025-09-13 20:34:21:3421 [32minfo[39m: [32mCORS Origin: http://localhost:4200[39m
+2025-09-13 20:34:21:3421 [32minfo[39m: [32mMongoDB connected successfully[39m
+2025-09-13 20:34:21:3421 [32minfo[39m: [32mDatabase connection established[39m
+2025-09-17 09:41:29:4129 [32minfo[39m: [32mServer running on port 3001[39m
+2025-09-17 09:41:29:4129 [32minfo[39m: [32mEnvironment: development[39m
+2025-09-17 09:41:29:4129 [32minfo[39m: [32mCORS Origin: http://localhost:4200[39m
+2025-09-17 09:41:29:4129 [32minfo[39m: [32mMongoDB connected successfully[39m
+2025-09-17 09:41:29:4129 [32minfo[39m: [32mDatabase connection established[39m
+2025-09-17 09:46:17:4617 [35mhttp[39m: [35mGET /api/client?page=1&limit=10 - ::1[39m
+2025-09-17 09:47:10:4710 [35mhttp[39m: [35mGET /api/client?page=1&limit=10 - ::1[39m
+2025-09-17 09:55:23:5523 [35mhttp[39m: [35mGET /api/client?page=1&limit=10 - ::1[39m
+2025-09-17 09:55:51:5551 [35mhttp[39m: [35mGET /api/client?page=1&limit=10 - ::1[39m
+2025-09-17 10:09:03:93 [32minfo[39m: [32mServer running on port 3001[39m
+2025-09-17 10:09:03:93 [32minfo[39m: [32mEnvironment: development[39m
+2025-09-17 10:09:03:93 [32minfo[39m: [32mCORS Origin: http://localhost:4200[39m
+2025-09-17 10:09:03:93 [32minfo[39m: [32mMongoDB connected successfully[39m
+2025-09-17 10:09:03:93 [32minfo[39m: [32mDatabase connection established[39m
+2025-09-17 10:11:49:1149 [35mhttp[39m: [35mGET /api/client?page=1&limit=10 - ::1[39m
+2025-09-17 10:11:59:1159 [35mhttp[39m: [35mGET /api/client?page=1&limit=10 - ::1[39m
+2025-09-17 10:21:55:2155 [35mhttp[39m: [35mGET /api/client?page=1&limit=10 - ::1[39m
+2025-09-17 10:22:35:2235 [35mhttp[39m: [35mGET /api/client?page=1&limit=10 - ::1[39m
+2025-09-17 10:23:17:2317 [35mhttp[39m: [35mGET /api/client?page=1&limit=10 - ::1[39m
+2025-09-17 10:23:52:2352 [35mhttp[39m: [35mPOST /api/client - ::1[39m
+2025-09-17 10:44:55:4455 [35mhttp[39m: [35mPOST /api/client - ::1[39m
+2025-09-17 10:44:57:4457 [35mhttp[39m: [35mGET /api/client?page=1&limit=10 - ::1[39m
+2025-09-17 16:18:53:1853 [33mwarn[39m: [33mMongoDB disconnected[39m
+2025-09-17 16:19:04:194 [32minfo[39m: [32mMongoDB connected successfully[39m
+2025-09-17 17:03:53:353 [33mwarn[39m: [33mMongoDB disconnected[39m
+2025-09-17 17:04:03:43 [32minfo[39m: [32mMongoDB connected successfully[39m
+2025-09-17 18:30:55:3055 [33mwarn[39m: [33mMongoDB disconnected[39m
+2025-09-17 18:31:06:316 [32minfo[39m: [32mMongoDB connected successfully[39m
+2025-09-17 18:32:18:3218 [35mhttp[39m: [35mGET /api/client/68ca43cfba40b61cc81bd825 - ::1[39m
+2025-09-17 18:32:39:3239 [35mhttp[39m: [35mGET /api/client?page=1&limit=10 - ::1[39m
+2025-09-17 18:32:41:3241 [35mhttp[39m: [35mGET /api/client?page=1&limit=10 - ::1[39m
+2025-09-17 18:32:48:3248 [35mhttp[39m: [35mGET /api/client/68ca43cfba40b61cc81bd825 - ::1[39m
+2025-09-17 18:32:54:3254 [35mhttp[39m: [35mGET /api/client?page=1&limit=10 - ::1[39m
+2025-09-17 18:42:42:4242 [35mhttp[39m: [35mGET /api/client/68ca43cfba40b61cc81bd825 - ::1[39m
+2025-09-17 18:48:53:4853 [35mhttp[39m: [35mGET /api/client?page=1&limit=10 - ::1[39m
+2025-09-17 18:48:56:4856 [35mhttp[39m: [35mGET /api/client/68ca43cfba40b61cc81bd825 - ::1[39m
+2025-09-17 18:50:59:5059 [35mhttp[39m: [35mGET /api/client?page=1&limit=10 - ::1[39m
+2025-09-17 18:51:28:5128 [35mhttp[39m: [35mGET /api/client/68ca43cfba40b61cc81bd825 - ::1[39m
+2025-09-17 19:33:47:3347 [33mwarn[39m: [33mMongoDB disconnected[39m
+2025-09-17 19:33:57:3357 [32minfo[39m: [32mMongoDB connected successfully[39m
+2025-09-17 21:41:59:4159 [33mwarn[39m: [33mMongoDB disconnected[39m
+2025-09-17 21:42:09:429 [32minfo[39m: [32mMongoDB connected successfully[39m
+2025-09-17 23:07:27:727 [32minfo[39m: [32mServer running on port 3001[39m
+2025-09-17 23:07:27:727 [32minfo[39m: [32mEnvironment: development[39m
+2025-09-17 23:07:27:727 [32minfo[39m: [32mCORS Origin: http://localhost:4200[39m
+2025-09-17 23:07:27:727 [32minfo[39m: [32mMongoDB connected successfully[39m
+2025-09-17 23:07:27:727 [32minfo[39m: [32mDatabase connection established[39m
