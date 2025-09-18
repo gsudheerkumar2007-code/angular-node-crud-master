@@ -38,6 +38,16 @@ const ClientSchema = new mongoose.Schema({
 	birthDate: {
 		type: Date,
 		required: false
+	},
+	pincode: {
+		type: String,
+		required: true,
+		validate: {
+			validator: function(v) {
+				return /^\d{6}$/.test(v);
+			},
+			message: 'Pincode must be exactly 6 digits'
+		}
 	}
 }, {
 	timestamps: true
@@ -48,6 +58,7 @@ ClientSchema.index({ email: 1 }, { unique: true });
 ClientSchema.index({ name: 1 });
 ClientSchema.index({ status: 1 });
 ClientSchema.index({ code: 1 }, { unique: true });
+ClientSchema.index({ pincode: 1 });
 ClientSchema.index({ createdAt: 1 });
 ClientSchema.index({ updatedAt: 1 });
 

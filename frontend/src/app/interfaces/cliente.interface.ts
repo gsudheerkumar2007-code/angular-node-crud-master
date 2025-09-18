@@ -8,6 +8,7 @@ export interface Cliente {
     telephone?: string;
     status?: string;
     birthDate?: Date;
+    pincode: string;
     createdAt?: Date;
     updatedAt?: Date;
 }

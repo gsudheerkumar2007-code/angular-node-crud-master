@@ -54,6 +54,23 @@
                                     {{ getFieldError('email') }}
                                 </div>
                             </div>
+
+                            <div class="form-group col-md-6 mb-3">
+                                <label for="pincode" class="form-label">Pincode *</label>
+                                <input
+                                    type="text"
+                                    id="pincode"
+                                    class="form-control"
+                                    [class.is-invalid]="getFieldError('pincode')"
+                                    [class.is-valid]="form.get('pincode')?.valid && form.get('pincode')?.touched"
+                                    placeholder="Enter 6-digit pincode"
+                                    formControlName="pincode"
+                                    pattern="[0-9]{6}"
+                                    maxlength="6" />
+                                <div *ngIf="getFieldError('pincode')" class="invalid-feedback">
+                                    {{ getFieldError('pincode') }}
+                                </div>
+                            </div>
                         </div>
 
                         <div class="row">

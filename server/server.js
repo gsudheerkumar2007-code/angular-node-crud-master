@@ -81,7 +81,11 @@ mongoose.connect(mongoUri, {
 })
 .catch(err => {
   logger.error('MongoDB connection error:', err);
-  process.exit(1);
+  if (process.env.NODE_ENV === 'development' && process.env.DISABLE_AUTH === 'true') {
+    logger.warn('Running in development mode without MongoDB - some features may not work');
+  } else {
+    process.exit(1);
+  }
 });
 
 // Load models

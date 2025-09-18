@@ -72,6 +72,10 @@ export class ClienteCadComponent implements OnInit, OnDestroy {
       birthDate: [
         client?.birthDate ? this.formatDateForInput(client.birthDate) : '',
         [this.dateValidator]
+      ],
+      pincode: [
+        client?.pincode || '',
+        [Validators.required, Validators.pattern(/^\d{6}$/)]
       ]
     });
   }
@@ -223,7 +227,10 @@ export class ClienteCadComponent implements OnInit, OnDestroy {
     if (errors['email']) return 'Please enter a valid email address';
     if (errors['minlength']) return `${fieldName} must be at least ${errors['minlength'].requiredLength} characters`;
     if (errors['maxlength']) return `${fieldName} cannot exceed ${errors['maxlength'].requiredLength} characters`;
-    if (errors['pattern']) return `Please enter a valid ${fieldName} format`;
+    if (errors['pattern']) {
+      if (fieldName === 'pincode') return 'Pincode must be exactly 6 digits';
+      return `Please enter a valid ${fieldName} format`;
+    }
     if (errors['min']) return `${fieldName} must be at least ${errors['min'].min}`;
     if (errors['invalidDate']) return 'Please enter a valid date';
     if (errors['futureDate']) return 'Birth date cannot be in the future';

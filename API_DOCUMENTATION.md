@@ -114,6 +114,7 @@ The API implements multiple layers of rate limiting:
   "telephone": "string (optional)",
   "status": "string (required, default: 'active')",
   "birthDate": "Date (optional)",
+  "pincode": "string (required, exactly 6 digits)",
   "createdAt": "Date",
   "updatedAt": "Date"
 }
@@ -281,6 +282,7 @@ The API implements multiple layers of rate limiting:
       "telephone": "+0987654321",
       "status": "active",
       "birthDate": "1990-01-15T00:00:00.000Z",
+      "pincode": "123456",
       "createdAt": "2023-12-01T09:00:00.000Z",
       "updatedAt": "2023-12-01T09:00:00.000Z"
     }
@@ -315,6 +317,7 @@ The API implements multiple layers of rate limiting:
   "telephone": "+0987654321",
   "status": "active",
   "birthDate": "1990-01-15T00:00:00.000Z",
+  "pincode": "123456",
   "createdAt": "2023-12-01T09:00:00.000Z",
   "updatedAt": "2023-12-01T09:00:00.000Z"
 }
@@ -338,7 +341,8 @@ The API implements multiple layers of rate limiting:
   "address": "456 Oak Ave, City, State",
   "telephone": "+0987654321",
   "status": "active",
-  "birthDate": "1985-03-20"
+  "birthDate": "1985-03-20",
+  "pincode": "654321"
 }
 ```
 
@@ -351,6 +355,7 @@ The API implements multiple layers of rate limiting:
 - `telephone`: 10-15 characters, optional
 - `status`: Must be 'active' or 'inactive', defaults to 'active'
 - `birthDate`: Valid date, must not be in the future, optional
+- `pincode`: Exactly 6 digits (0-9), required
 
 **Success Response (201):**
 ```json
@@ -364,6 +369,7 @@ The API implements multiple layers of rate limiting:
   "telephone": "+0987654321",
   "status": "active",
   "birthDate": "1985-03-20T00:00:00.000Z",
+  "pincode": "654321",
   "createdAt": "2023-12-01T11:00:00.000Z",
   "updatedAt": "2023-12-01T11:00:00.000Z"
 }
@@ -402,6 +408,7 @@ The API implements multiple layers of rate limiting:
   "telephone": "+0987654321",
   "status": "inactive",
   "birthDate": "1985-03-20T00:00:00.000Z",
+  "pincode": "654321",
   "createdAt": "2023-12-01T11:00:00.000Z",
   "updatedAt": "2023-12-01T12:00:00.000Z"
 }
@@ -581,7 +588,8 @@ curl -X POST http://localhost:3001/api/client \
     "name": "John Smith",
     "email": "john.smith@example.com",
     "phone": "+1234567890",
-    "status": "active"
+    "status": "active",
+    "pincode": "123456"
   }'
 ```
 

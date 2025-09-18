@@ -71,7 +71,7 @@ docker-compose up -d
 - **Proxy**: Development proxy configured to forward `/api/*` to `localhost:3001`
 
 ### Database Schema
-- **Client Model**: code, name, email (unique), phone, address, telephone, status, birthDate
+- **Client Model**: code, name, email (unique), phone, address, telephone, status, birthDate, pincode (required, 6 digits)
 - **User Model**: Authentication with roles (admin/user)
 - **Indexes**: Optimized for email uniqueness, name/status queries, and temporal sorting
 
@@ -113,6 +113,19 @@ CORS_ORIGIN=http://localhost:4200
 - CORS configuration
 - Password hashing with bcryptjs
 - MongoDB injection protection
+
+## Field Validation Rules
+
+### Client Model Validations
+- **code**: Positive integer, required, unique
+- **name**: 2-100 characters, required
+- **email**: Valid email format, required, unique, lowercase
+- **phone**: 10-15 characters, optional, pattern validation
+- **address**: Max 200 characters, optional
+- **telephone**: 10-15 characters, optional
+- **status**: 'active' or 'inactive', defaults to 'active'
+- **birthDate**: Valid date, cannot be future date, optional
+- **pincode**: Exactly 6 digits (0-9), required, string type to preserve leading zeros
 
 ## Testing
 - **Backend**: Jest with supertest for API testing, MongoDB Memory Server for test database

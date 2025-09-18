@@ -63,6 +63,12 @@
                                            [class.fa-sort-up]="fieldOrderBy === 'email' && multiplierOrderBy === 1"
                                            [class.fa-sort-down]="fieldOrderBy === 'email' && multiplierOrderBy === -1"></i>
                                     </th>
+                                    <th scope="col" class="clickable" (click)="orderBy('pincode')">
+                                        Pincode
+                                        <i class="fas fa-sort"
+                                           [class.fa-sort-up]="fieldOrderBy === 'pincode' && multiplierOrderBy === 1"
+                                           [class.fa-sort-down]="fieldOrderBy === 'pincode' && multiplierOrderBy === -1"></i>
+                                    </th>
                                     <th scope="col" class="clickable d-none d-md-table-cell" (click)="orderBy('phone')">
                                         Phone
                                         <i class="fas fa-sort"
@@ -101,6 +107,9 @@
                                         <a [href]="'mailto:' + client.email" class="text-decoration-none">
                                             {{ client.email }}
                                         </a>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-secondary">{{ client.pincode }}</span>
                                     </td>
                                     <td class="d-none d-md-table-cell">
                                         <a *ngIf="client.phone" [href]="'tel:' + client.phone" class="text-decoration-none">
@@ -142,7 +151,7 @@
                                     </td>
                                 </tr>
                                 <tr *ngIf="(clientList$ | async)?.length === 0" class="text-center">
-                                    <td colspan="7" class="py-4 text-muted">
+                                    <td colspan="8" class="py-4 text-muted">
                                         <i class="fas fa-users fa-2x mb-2 d-block"></i>
                                         <p class="mb-0">No clients found</p>
                                         <a [routerLink]="['/clients/add']" class="btn btn-primary btn-sm mt-2">
